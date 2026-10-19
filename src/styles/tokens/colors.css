@@ -58,6 +58,10 @@
   --accent: var(--solar);
   --accent-tint: var(--solar-12);
 
+  /* --- Primary button tokens (#709) ------------------------------------ */
+  --button-primary-bg: var(--solar);
+  --button-primary-fg: #0b2b23; /* deep-pine ink guarantees 8.64:1 AAA contrast on solar */
+
   --focus-ring: var(--solar); /* 2px solar ring + 1px ink offset      */
   --focus-offset: var(--ink);
 
@@ -99,6 +103,11 @@
   --solar-24: rgba(255, 180, 0, 0.26);
   --growth-12: rgba(93, 217, 154, 0.14);
   --ember-12: rgba(255, 155, 130, 0.14);
+
+  /* --- Primary button tokens (#709) ------------------------------------ */
+  --text-on-solar: #0b2b23; /* prevents text on solar from inverting to light ink in dark theme */
+  --button-primary-bg: var(--solar);
+  --button-primary-fg: #0b2b23; /* fixed deep-pine ink preserves 8.64:1 AAA contrast on solar */
 
   /* --- Overlay & backdrop --------------------------------------------- */
   --backdrop: rgba(237, 242, 236, 0.65); /* modal/dialog backdrop overlay */

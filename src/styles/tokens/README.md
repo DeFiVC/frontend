@@ -22,16 +22,18 @@ Use the CSS tokens in these files as the single source of truth:
 
 ### Color tokens
 
-| Token       | Light value             | Dark value                  | Used for                    |
-| :---------- | :---------------------- | :-------------------------- | :-------------------------- |
-| `--ink`     | `#0b2b23`               | `#edf2ec`                   | headings, body text, icons  |
-| `--canvas`  | `#f3f5f1`               | `#0d1714`                   | page background             |
-| `--surface` | `#fcfdfb`               | `#13201b`                   | cards and elevated panels   |
-| `--solar`   | `#ffb400`               | `#ffb400`                   | brand accent / highlight    |
-| `--growth`  | `#0e6f44`               | `#5dd99a`                   | positive metrics            |
-| `--ember`   | `#b3361b`               | `#ff9b82`                   | negative metrics and errors |
-| `--ink-60`  | `rgba(11, 43, 35, 0.6)` | `rgba(237, 242, 236, 0.72)` | secondary text              |
-| `--ink-40`  | `rgba(11, 43, 35, 0.4)` | `rgba(237, 242, 236, 0.52)` | tertiary text and dividers  |
+| Token                 | Light value              | Dark value                  | Used for                                   |
+| :-------------------- | :----------------------- | :-------------------------- | :----------------------------------------- |
+| `--ink`               | `#0b2b23`                | `#edf2ec`                   | headings, body text, icons                 |
+| `--canvas`            | `#f3f5f1`                | `#0d1714`                   | page background                            |
+| `--surface`           | `#fcfdfb`                | `#13201b`                   | cards and elevated panels                  |
+| `--solar`             | `#ffb400`                | `#ffb400`                   | brand accent / highlight                   |
+| `--growth`            | `#0e6f44`                | `#5dd99a`                   | positive metrics                           |
+| `--ember`             | `#b3361b`                | `#ff9b82`                   | negative metrics and errors                |
+| `--ink-60`            | `rgba(11, 43, 35, 0.6)`  | `rgba(237, 242, 236, 0.72)` | secondary text                             |
+| `--ink-40`            | `rgba(11, 43, 35, 0.4)`  | `rgba(237, 242, 236, 0.52)` | tertiary text and dividers                 |
+| `--button-primary-bg` | `#ffb400` (var(--solar)) | `#ffb400` (var(--solar))    | primary button background                  |
+| `--button-primary-fg` | `#0b2b23`                | `#0b2b23`                   | primary button label (8.64:1 AAA contrast) |
 
 ### Typography scale
 

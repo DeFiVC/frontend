@@ -94,4 +94,13 @@ describe('ThemeProvider', () => {
     expect(screen.getByLabelText('Current theme')).toHaveTextContent('dark')
     expect(document.documentElement.dataset.theme).toBe('dark')
   })
+
+  it('does not render an inline style element (#709)', () => {
+    const { container } = render(
+      <ThemeProvider>
+        <ThemeProbe />
+      </ThemeProvider>,
+    )
+    expect(container.querySelector('style')).toBeNull()
+  })
 })

@@ -3,6 +3,7 @@
 import { useEffect, useSyncExternalStore } from 'react'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
+import { Button } from '../components'
 import { Helio } from '../brand/Helio'
 import { reportError } from '../lib/errorReporting'
 import { useHorizonHealth } from '../hooks/useHorizonHealth'
@@ -128,29 +129,7 @@ export default function GlobalError({
       {!error.digest && <div style={{ marginBottom: 32 }} />}
 
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center' }}>
-        <button
-          type="button"
-          onClick={reset}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            height: 44,
-            padding: '0 20px',
-            fontFamily: 'var(--font-body)',
-            fontWeight: 600,
-            fontSize: 15,
-            lineHeight: 1,
-            borderRadius: 'var(--radius-pill)',
-            background: 'var(--solar)',
-            color: 'var(--ink)',
-            border: '1px solid transparent',
-            cursor: 'pointer',
-            transition: 'background var(--dur-press) var(--ease-out)',
-          }}
-        >
-          {t('tryAgain')}
-        </button>
+        <Button onClick={reset}>{t('tryAgain')}</Button>
 
         <Link
           href="/"

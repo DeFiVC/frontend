@@ -93,6 +93,9 @@ export const colors = {
   accent: 'var(--accent)',
   accentTint: 'var(--accent-tint)',
 
+  buttonPrimaryBg: 'var(--button-primary-bg)',
+  buttonPrimaryFg: 'var(--button-primary-fg)',
+
   focusRing: 'var(--focus-ring)',
   focusOffset: 'var(--focus-offset)',
 } as const

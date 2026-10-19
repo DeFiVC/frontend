@@ -35,6 +35,8 @@ describe('Heliobond Theme Configuration', () => {
       expect(colors.ink40).toBe('var(--ink-40)')
       expect(colors.ink12).toBe('var(--ink-12)')
       expect(colors.ink06).toBe('var(--ink-06)')
+      expect(colors.buttonPrimaryBg).toBe('var(--button-primary-bg)')
+      expect(colors.buttonPrimaryFg).toBe('var(--button-primary-fg)')
       expect(colors.focusRing).toBe('var(--focus-ring)')
     })
 

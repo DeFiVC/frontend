@@ -79,4 +79,13 @@ describe('route error boundary offline detection (#710)', () => {
     render(<RouteError error={new Error('boom')} reset={vi.fn()} />)
     expect(screen.getByRole('link', { name: 'Go home' })).toHaveAttribute('href', '/')
   })
+
+  it('renders a primary Button for Try again with primary tokens (#709)', () => {
+    const reset = vi.fn()
+    render(<RouteError error={new Error('boom')} reset={reset} />)
+    const btn = screen.getByRole('button', { name: 'Try again' })
+    expect(btn).toBeInTheDocument()
+    expect(btn.style.background).toContain('var(--button-primary-bg)')
+    expect(btn.style.color).toContain('var(--button-primary-fg)')
+  })
 })
