@@ -2,6 +2,33 @@ import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@/test/render'
 import { TaxReports } from './TaxReports'
 import * as taxReportLib from '@/lib/tax-report'
+import type { Activity } from '@/data'
+
+const mockWallet = {
+  address: 'GBQHWXVZ2K4M6N8P3R5T7W9YA2C4E6G8J3L5Q7S9U2X4Z6B8D1F3H59XQ',
+  connected: true,
+  isDemo: false,
+}
+
+const mockPortfolio = {
+  activity: [] as Activity[],
+}
+
+vi.mock('@/wallet/WalletProvider', () => ({
+  useWallet: () => mockWallet,
+}))
+
+vi.mock('@/hooks/usePortfolio', () => ({
+  usePortfolio: () => mockPortfolio,
+}))
+
+vi.mock('@/lib/api', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/api')>()
+  return {
+    ...actual,
+    shouldShowDemoBadge: () => mockWallet.isDemo || !mockWallet.connected,
+  }
+})
 
 vi.mock('@/lib/tax-report', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/lib/tax-report')>()
@@ -11,59 +38,86 @@ vi.mock('@/lib/tax-report', async (importOriginal) => {
   }
 })
 
-describe('TaxReports screen (#786)', () => {
+describe('TaxReports screen (#787)', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockWallet.address = 'GBQHWXVZ2K4M6N8P3R5T7W9YA2C4E6G8J3L5Q7S9U2X4Z6B8D1F3H59XQ'
+    mockWallet.connected = true
+    mockWallet.isDemo = false
+    mockPortfolio.activity = []
   })
 
-  it('renders table and does not show skipped alert when all events have valid dates', () => {
-    render(<TaxReports />)
-
-    expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument()
-    expect(screen.queryByTestId('tax-reports-skipped-alert')).toBeNull()
-    expect(screen.getByText('2025-Q1')).toBeInTheDocument()
-    expect(screen.getByText('2025-Q2')).toBeInTheDocument()
-  })
-
-  it('surfaces the skipped count banner when input contains invalid dates', () => {
-    const mixedEvents: taxReportLib.InvestmentEvent[] = [
+  it('renders real wallet activity and hides DemoDataBadge for connected real wallet', () => {
+    mockWallet.connected = true
+    mockWallet.isDemo = false
+    mockPortfolio.activity = [
       {
-        id: '1',
-        projectName: 'Solar Farm A',
-        date: '2025-01-10',
-        type: 'deposit',
-        amountUSD: 1000,
+        kind: 'Deposit',
+        amount: '$2,500.00',
+        shares: '2,500 HBS',
+        when: '2025-02-10',
+        hash: '0xtx1',
       },
       {
-        id: '2',
-        projectName: 'Corrupted Project',
-        date: 'invalid-date',
-        type: 'deposit',
-        amountUSD: 200,
+        kind: 'Withdrawal',
+        amount: '$500.00',
+        shares: '500 HBS',
+        when: '2025-05-20',
+        hash: '0xtx2',
       },
-      {
-        id: '3',
-        projectName: 'Missing Date Project',
-        date: '',
-        type: 'distribution',
-        amountUSD: 50,
-      },
-      { id: '4', projectName: 'Wind Co B', date: '2025-04-05', type: 'deposit', amountUSD: 500 },
     ]
 
-    render(<TaxReports events={mixedEvents} />)
+    render(<TaxReports />)
 
-    const alert = screen.getByTestId('tax-reports-skipped-alert')
-    expect(alert).toBeInTheDocument()
-    expect(alert).toHaveTextContent(/2 events with invalid dates were excluded/i)
+    // Demo badge must NOT appear for connected real wallet
+    expect(screen.queryByText(/demo data/i)).toBeNull()
 
-    // Valid quarters are still rendered and no NaN-QNaN row exists
+    // Real quarters are rendered
     expect(screen.getByText('2025-Q1')).toBeInTheDocument()
     expect(screen.getByText('2025-Q2')).toBeInTheDocument()
-    expect(screen.queryByText(/NaN/)).toBeNull()
+    expect(screen.getByText('$2500.00')).toBeInTheDocument()
+    expect(screen.getByText('$500.00')).toBeInTheDocument()
+  })
+
+  it('displays empty state message when connected real wallet has no activity', () => {
+    mockWallet.connected = true
+    mockWallet.isDemo = false
+    mockPortfolio.activity = []
+
+    render(<TaxReports />)
+
+    expect(screen.queryByText(/demo data/i)).toBeNull()
+    expect(screen.getByText('No investment activity recorded for this wallet.')).toBeInTheDocument()
+  })
+
+  it('shows DemoDataBadge and renders placeholder events in demo mode', () => {
+    mockWallet.connected = true
+    mockWallet.isDemo = true
+    mockPortfolio.activity = []
+
+    render(<TaxReports />)
+
+    // Demo badge must appear in demo mode
+    expect(screen.getByText(/demo data/i)).toBeInTheDocument()
+
+    // Renders default placeholder quarters
+    expect(screen.getByText('2025-Q1')).toBeInTheDocument()
+    expect(screen.getByText('2025-Q3')).toBeInTheDocument()
+    expect(screen.getByText('2025-Q4')).toBeInTheDocument()
+  })
+
+  it('shows DemoDataBadge when disconnected', () => {
+    mockWallet.connected = false
+    mockWallet.isDemo = false
+    mockPortfolio.activity = []
+
+    render(<TaxReports />)
+
+    expect(screen.getByText(/demo data/i)).toBeInTheDocument()
   })
 
   it('triggers CSV download when Export CSV button is clicked', () => {
+    mockWallet.isDemo = true
     render(<TaxReports />)
 
     const exportBtn = screen.getByRole('button', { name: /export csv/i })

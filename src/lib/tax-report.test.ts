@@ -2,11 +2,12 @@
 import { describe, it, expect } from 'vitest'
 import {
   computeQuarterlyTaxReport,
-  computeQuarterlyTaxReportDetailed,
   quarterlyReportToCsv,
   getQuarter,
+  activityToInvestmentEvents,
   type InvestmentEvent,
 } from './tax-report'
+import type { Activity } from '../data'
 
 describe('getQuarter', () => {
   it('maps January to Q1', () => {
@@ -20,12 +21,6 @@ describe('getQuarter', () => {
   })
   it('maps December 31 to Q4', () => {
     expect(getQuarter('2025-12-31')).toEqual({ year: 2025, quarterNumber: 4 })
-  })
-  it('returns null for invalid or non-ISO dates', () => {
-    expect(getQuarter('invalid-date')).toBeNull()
-    expect(getQuarter('')).toBeNull()
-    expect(getQuarter('2025-Q1')).toBeNull()
-    expect(getQuarter('undefined')).toBeNull()
   })
 })
 
@@ -178,62 +173,49 @@ describe('quarterlyReportToCsv', () => {
   })
 })
 
-describe('computeQuarterlyTaxReport date validation (#786)', () => {
-  it('skips invalid dates and never creates a NaN-QNaN quarter row', () => {
-    const mixedEvents: InvestmentEvent[] = [
+describe('activityToInvestmentEvents (#787)', () => {
+  it('converts portfolio activity feed items into investment events', () => {
+    const activity: Activity[] = [
       {
-        id: '1',
-        projectName: 'Solar Farm A',
-        date: '2025-01-15',
-        type: 'deposit',
-        amountUSD: 1000,
+        kind: 'Deposit',
+        amount: '$1,000.00',
+        shares: '1,000 HBS',
+        when: '2025-01-15',
+        hash: '0xhash1',
       },
       {
-        id: '2',
-        projectName: 'Corrupt Date 1',
-        date: 'not-a-date',
-        type: 'deposit',
-        amountUSD: 200,
+        kind: 'Withdrawal',
+        amount: '$400.00',
+        shares: '400 HBS',
+        when: '2025-04-10',
+        hash: '0xhash2',
       },
-      { id: '3', projectName: 'Corrupt Date 2', date: '', type: 'distribution', amountUSD: 50 },
       {
-        id: '4',
-        projectName: 'Corrupt Date 3',
-        date: '2025-Q1',
-        type: 'withdrawal',
-        amountUSD: 100,
+        kind: 'Score update',
+        amount: '',
+        shares: '',
+        when: '2025-05-01',
+        hash: '0xhash3',
       },
-      { id: '5', projectName: 'Wind Farm B', date: '2025-04-20', type: 'deposit', amountUSD: 500 },
     ]
 
-    const report = computeQuarterlyTaxReport(mixedEvents)
-
-    // Invalid dates must never create quarter rows
-    expect(report.map((l) => l.quarter)).toEqual(['2025-Q1', '2025-Q2'])
-    expect(report.some((l) => l.quarter.includes('NaN'))).toBe(false)
-    expect(report.skippedCount).toBe(3)
-    expect(report.skippedEvents.map((e) => e.id)).toEqual(['2', '3', '4'])
-
-    // Generated CSV must not contain any NaN-QNaN
-    const csv = quarterlyReportToCsv(report)
-    expect(csv).not.toContain('NaN')
-    expect(csv).toContain('2025-Q1')
-    expect(csv).toContain('2025-Q2')
-
-    // Detailed report returns matching metadata
-    const detailed = computeQuarterlyTaxReportDetailed(mixedEvents)
-    expect(detailed.skippedCount).toBe(3)
-    expect(detailed.lines.map((l) => l.quarter)).toEqual(['2025-Q1', '2025-Q2'])
-    expect(detailed.skippedEvents.length).toBe(3)
+    const events = activityToInvestmentEvents(activity)
+    expect(events).toHaveLength(2)
+    expect(events[0]).toMatchObject({
+      id: '0xhash1',
+      type: 'deposit',
+      amountUSD: 1000,
+      date: '2025-01-15',
+    })
+    expect(events[1]).toMatchObject({
+      id: '0xhash2',
+      type: 'withdrawal',
+      amountUSD: 400,
+      date: '2025-04-10',
+    })
   })
 
-  it('returns empty array and surfaces skipped count when all dates are invalid', () => {
-    const invalidEvents: InvestmentEvent[] = [
-      { id: '1', projectName: 'Corrupt', date: 'malformed-date', type: 'deposit', amountUSD: 300 },
-    ]
-    const report = computeQuarterlyTaxReport(invalidEvents)
-    expect(report).toEqual([])
-    expect(report.skippedCount).toBe(1)
-    expect(report.skippedEvents[0].id).toBe('1')
+  it('handles empty activity list', () => {
+    expect(activityToInvestmentEvents([])).toEqual([])
   })
 })

@@ -443,7 +443,8 @@
     "columnRealizedGain": "Realized Gain",
     "currencyFormat": "${amount}",
     "skippedBadge": "Notice",
-    "skippedAlert": "{count, plural, one {# event with an invalid date was excluded from this report.} other {# events with invalid dates were excluded from this report.}}"
+    "skippedAlert": "{count, plural, one {# event with an invalid date was excluded from this report.} other {# events with invalid dates were excluded from this report.}}",
+    "emptyState": "No investment activity recorded for this wallet."
   },
   "PasswordResetEmail": {
     "subject": "Reset your Heliobond password",

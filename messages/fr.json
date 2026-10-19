@@ -436,7 +436,8 @@
     "columnRealizedGain": "Gain réalisé",
     "currencyFormat": "{amount} $",
     "skippedBadge": "Avis",
-    "skippedAlert": "{count, plural, one {# événement avec une date invalide a été exclu de ce rapport.} other {# événements avec des dates invalides ont été exclus de ce rapport.}}"
+    "skippedAlert": "{count, plural, one {# événement avec une date invalide a été exclu de ce rapport.} other {# événements avec des dates invalides ont été exclus de ce rapport.}}",
+    "emptyState": "Aucune activité d'investissement enregistrée pour ce portefeuille."
   },
   "PasswordResetEmail": {
     "subject": "Réinitialisez votre mot de passe Heliobond",

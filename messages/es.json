@@ -436,7 +436,8 @@
     "columnRealizedGain": "Ganancia realizada",
     "currencyFormat": "${amount}",
     "skippedBadge": "Aviso",
-    "skippedAlert": "{count, plural, one {# evento con fecha no válida fue excluido de este informe.} other {# eventos con fechas no válidas fueron excluidos de este informe.}}"
+    "skippedAlert": "{count, plural, one {# evento con fecha no válida fue excluido de este informe.} other {# eventos con fechas no válidas fueron excluidos de este informe.}}",
+    "emptyState": "No hay actividad de inversión registrada para esta billetera."
   },
   "PasswordResetEmail": {
     "subject": "Restablece tu contraseña de Heliobond",
