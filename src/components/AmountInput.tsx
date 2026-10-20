@@ -39,6 +39,10 @@ export interface AmountInputProps {
   preview?: ReactNode
   /** Accessible label text for the field input. */
   label?: string
+  /** Mark the amount field invalid after submission validation. */
+  invalid?: boolean
+  /** Error description referenced by the amount field when invalid. */
+  errorId?: string
   /** HTML `id` attribute for input binding. */
   id?: string
   /** Custom inline style overrides. */
@@ -60,6 +64,8 @@ export function AmountInput({
   capActionLabel,
   preview,
   label = '',
+  invalid = false,
+  errorId,
   id = 'hb-amount',
   style,
 }: AmountInputProps) {
@@ -136,6 +142,8 @@ export function AmountInput({
           placeholder="0.00"
           value={value}
           aria-label={label || 'Investment amount'}
+          aria-invalid={invalid || undefined}
+          aria-describedby={invalid ? errorId : undefined}
           onFocus={(e) => e.target.select()}
           onPaste={(e) => {
             e.preventDefault()
@@ -318,6 +326,8 @@ AmountInput.propTypes = {
   capActionLabel: PropTypes.string,
   preview: PropTypes.node,
   label: PropTypes.string,
+  invalid: PropTypes.bool,
+  errorId: PropTypes.string,
   id: PropTypes.string,
   style: PropTypes.object,
 }

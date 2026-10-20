@@ -1,0 +1,854 @@
+[
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "__constructor",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "admin",
+          "type_": "address"
+        },
+        {
+          "doc": "",
+          "name": "whitelister",
+          "type_": "address"
+        }
+      ],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "set_whitelist",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "account",
+          "type_": "address"
+        },
+        {
+          "doc": "",
+          "name": "status",
+          "type_": "bool"
+        }
+      ],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "create_project",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "creator",
+          "type_": "address"
+        },
+        {
+          "doc": "",
+          "name": "uri",
+          "type_": "string"
+        },
+        {
+          "doc": "",
+          "name": "maturity_date",
+          "type_": "u64"
+        },
+        {
+          "doc": "",
+          "name": "metadata_hash",
+          "type_": "bytes_n"
+        }
+      ],
+      "outputs": ["u32"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "get_project",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "id",
+          "type_": "u32"
+        }
+      ],
+      "outputs": ["udt"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "total_projects",
+      "inputs": [],
+      "outputs": ["u32"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "verify_metadata_hash",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "project_id",
+          "type_": "u32"
+        },
+        {
+          "doc": "",
+          "name": "candidate_hash",
+          "type_": "bytes_n"
+        }
+      ],
+      "outputs": ["bool"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "update_impact_score",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "project_id",
+          "type_": "u32"
+        },
+        {
+          "doc": "",
+          "name": "credit_quality",
+          "type_": "u32"
+        },
+        {
+          "doc": "",
+          "name": "green_impact",
+          "type_": "u32"
+        }
+      ],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "update_impact_score_approved",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "project_id",
+          "type_": "u32"
+        },
+        {
+          "doc": "",
+          "name": "credit_quality",
+          "type_": "u32"
+        },
+        {
+          "doc": "",
+          "name": "green_impact",
+          "type_": "u32"
+        },
+        {
+          "doc": "",
+          "name": "approvals",
+          "type_": "vec"
+        }
+      ],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "update_credit_quality_score",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "project_id",
+          "type_": "u32"
+        },
+        {
+          "doc": "",
+          "name": "credit_quality",
+          "type_": "u32"
+        }
+      ],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "next_update_allowed_at",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "project_id",
+          "type_": "u32"
+        }
+      ],
+      "outputs": ["u64"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "get_score_history",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "project_id",
+          "type_": "u32"
+        }
+      ],
+      "outputs": ["vec"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "certify_project",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "caller",
+          "type_": "address"
+        },
+        {
+          "doc": "",
+          "name": "project_id",
+          "type_": "u32"
+        },
+        {
+          "doc": "",
+          "name": "status",
+          "type_": "udt"
+        }
+      ],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "is_mature",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "project_id",
+          "type_": "u32"
+        }
+      ],
+      "outputs": ["bool"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "get_all_projects",
+      "inputs": [],
+      "outputs": ["vec"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "get_projects_page",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "offset",
+          "type_": "u32"
+        },
+        {
+          "doc": "",
+          "name": "limit",
+          "type_": "u32"
+        }
+      ],
+      "outputs": ["vec"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "create_proposal",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "proposer",
+          "type_": "address"
+        },
+        {
+          "doc": "",
+          "name": "description",
+          "type_": "string"
+        },
+        {
+          "doc": "",
+          "name": "voting_duration_secs",
+          "type_": "u64"
+        }
+      ],
+      "outputs": ["u32"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "cast_vote",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "voter",
+          "type_": "address"
+        },
+        {
+          "doc": "",
+          "name": "proposal_id",
+          "type_": "u32"
+        },
+        {
+          "doc": "",
+          "name": "support",
+          "type_": "bool"
+        },
+        {
+          "doc": "",
+          "name": "weight",
+          "type_": "i128"
+        }
+      ],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "execute_proposal",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "proposal_id",
+          "type_": "u32"
+        }
+      ],
+      "outputs": ["bool"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "get_proposal",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "proposal_id",
+          "type_": "u32"
+        }
+      ],
+      "outputs": ["udt"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "deposit_collateral",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "project_id",
+          "type_": "u32"
+        },
+        {
+          "doc": "",
+          "name": "depositor",
+          "type_": "address"
+        },
+        {
+          "doc": "",
+          "name": "token",
+          "type_": "address"
+        },
+        {
+          "doc": "",
+          "name": "amount",
+          "type_": "i128"
+        }
+      ],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "get_collateral",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "project_id",
+          "type_": "u32"
+        },
+        {
+          "doc": "",
+          "name": "token",
+          "type_": "address"
+        }
+      ],
+      "outputs": ["i128"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "release_collateral",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "project_id",
+          "type_": "u32"
+        },
+        {
+          "doc": "",
+          "name": "caller",
+          "type_": "address"
+        },
+        {
+          "doc": "",
+          "name": "token",
+          "type_": "address"
+        }
+      ],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "liquidate_collateral",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "project_id",
+          "type_": "u32"
+        },
+        {
+          "doc": "",
+          "name": "token",
+          "type_": "address"
+        },
+        {
+          "doc": "",
+          "name": "recipient",
+          "type_": "address"
+        }
+      ],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "liquidate_collateral_approved",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "project_id",
+          "type_": "u32"
+        },
+        {
+          "doc": "",
+          "name": "token",
+          "type_": "address"
+        },
+        {
+          "doc": "",
+          "name": "recipient",
+          "type_": "address"
+        },
+        {
+          "doc": "",
+          "name": "approvals",
+          "type_": "vec"
+        }
+      ],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "set_multisig_admin",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "signers",
+          "type_": "vec"
+        },
+        {
+          "doc": "",
+          "name": "threshold",
+          "type_": "u32"
+        }
+      ],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "clear_multisig_admin",
+      "inputs": [],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "get_multisig_admin",
+      "inputs": [],
+      "outputs": ["tuple"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "get_interest_rate",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "project_id",
+          "type_": "u32"
+        }
+      ],
+      "outputs": ["u32"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "set_creator_reputation",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "caller",
+          "type_": "address"
+        },
+        {
+          "doc": "",
+          "name": "creator",
+          "type_": "address"
+        },
+        {
+          "doc": "",
+          "name": "score",
+          "type_": "u32"
+        }
+      ],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "get_creator_reputation",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "creator",
+          "type_": "address"
+        }
+      ],
+      "outputs": ["u32"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "get_creator_funding_limit_bps",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "creator",
+          "type_": "address"
+        }
+      ],
+      "outputs": ["u32"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "set_whitelister",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "new_whitelister",
+          "type_": "address"
+        }
+      ],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "get_whitelister",
+      "inputs": [],
+      "outputs": ["address"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "archive_project",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "project_id",
+          "type_": "u32"
+        }
+      ],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "set_project_status",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "project_id",
+          "type_": "u32"
+        },
+        {
+          "doc": "",
+          "name": "status",
+          "type_": "udt"
+        }
+      ],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "delete_project",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "project_id",
+          "type_": "u32"
+        }
+      ],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "set_vault",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "vault",
+          "type_": "address"
+        }
+      ],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "get_vault",
+      "inputs": [],
+      "outputs": ["option"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "get_all_projects_with_archived",
+      "inputs": [],
+      "outputs": ["vec"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "compact_archive",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "project_id",
+          "type_": "u32"
+        }
+      ],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "get_archive_summary",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "project_id",
+          "type_": "u32"
+        }
+      ],
+      "outputs": ["udt"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "compact_storage",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "project_ids",
+          "type_": "vec"
+        },
+        {
+          "doc": "",
+          "name": "tokens",
+          "type_": "vec"
+        }
+      ],
+      "outputs": ["u32"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "pause",
+      "inputs": [],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "unpause",
+      "inputs": [],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "is_paused",
+      "inputs": [],
+      "outputs": ["bool"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "set_emergency_admin",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "emergency_admin",
+          "type_": "option"
+        }
+      ],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "get_emergency_admin",
+      "inputs": [],
+      "outputs": ["option"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "emergency_pause",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "caller",
+          "type_": "address"
+        }
+      ],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "emergency_unpause",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "caller",
+          "type_": "address"
+        }
+      ],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "health_check",
+      "inputs": [],
+      "outputs": ["udt"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "state_version",
+      "inputs": [],
+      "outputs": ["u32"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "stored_state_version",
+      "inputs": [],
+      "outputs": ["u32"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "migrate_state",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "from_version",
+          "type_": "u32"
+        }
+      ],
+      "outputs": ["u32"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "upgrade",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "new_wasm_hash",
+          "type_": "bytes_n"
+        }
+      ],
+      "outputs": []
+    }
+  }
+]

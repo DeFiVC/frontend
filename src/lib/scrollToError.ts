@@ -9,18 +9,21 @@ export function scrollToFirstError(
   options: ScrollToErrorOptions = {},
 ): boolean {
   const { behavior = 'smooth', block = 'center', focus = true } = options
-  const root = container instanceof Document ? container : container
-  const selector = '[aria-invalid="true"], [data-invalid="true"], .field-error, [role="alert"]'
-  const el = root.querySelector(selector) as HTMLElement | null
+  const root = container
+  const invalidSelector = '[aria-invalid="true"], [data-invalid="true"]'
+  const invalidField = root.querySelector(invalidSelector) as HTMLElement | null
+  const errorMessage = root.querySelector('.field-error, [role="alert"]') as HTMLElement | null
+  const el = invalidField ?? errorMessage
   if (!el) return false
 
   const target = (el.closest('[data-field-wrapper]') as HTMLElement) || el
-  target.scrollIntoView({ behavior, block })
+  target.scrollIntoView?.({ behavior, block })
 
   if (focus) {
     const focusable =
-      target.querySelector<HTMLElement>('input, select, textarea, button') ||
-      (target as HTMLElement)
+      (target.matches('input, select, textarea, button, [tabindex]') ? target : null) ||
+      target.querySelector<HTMLElement>('input, select, textarea, button, [tabindex]') ||
+      target
     if (focusable && typeof focusable.focus === 'function') {
       setTimeout(() => focusable.focus({ preventScroll: true }), 300)
     }
@@ -38,7 +41,7 @@ export function scrollToField(fieldId: string, options: ScrollToErrorOptions = {
   const { behavior = 'smooth', block = 'center', focus = true } = options
   const el = document.getElementById(fieldId)
   if (!el) return false
-  el.scrollIntoView({ behavior, block })
+  el.scrollIntoView?.({ behavior, block })
   if (focus && typeof (el as HTMLElement).focus === 'function') {
     setTimeout(() => (el as HTMLElement).focus({ preventScroll: true }), 300)
   }

@@ -61,6 +61,9 @@ test('connect → explore → project → deposit → portfolio → withdraw →
   await test.step('explore and open a project', async () => {
     await page.goto('/explore')
     await expect(page.getByTestId('network-pill')).toHaveText('STANDALONE')
+    // With NEXT_PUBLIC_REGISTRY_CONTRACT_ID set, explore loads live on-chain projects
+    // from the ProjectRegistry contract rather than static fixtures (#720).
+    await expect(page.locator('article')).toHaveCount(1)
     await page.locator('article').first().click()
     await expect(page).toHaveURL(/\/project\/\d+/)
   })

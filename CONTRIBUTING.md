@@ -244,6 +244,15 @@ timeouts, single worker, traces and video retained on failure under
 CI runs this same command nightly and on demand via
 `.github/workflows/e2e-chain.yml` (45-minute budget), not on pull requests.
 
+### Refreshing contract spec fixtures
+
+When updating Soroban contract interfaces or after a contracts release, refresh the committed fixtures in `src/test/fixtures/contracts/` using:
+
+```bash
+./scripts/contracts/update-specs.sh                                  # uses nearby WASMs or builds contracts@main
+CONTRACTS_WASM_DIR=path/to/wasm ./scripts/contracts/update-specs.sh  # use another prebuilt WASM directory
+```
+
 ## Development workflow
 
 1. Branch off `main`: `git checkout -b <type>/<short-description>` (e.g. `feat/withdraw-max-chip`, `fix/helio-glow`, `i18n/creator-screens`).

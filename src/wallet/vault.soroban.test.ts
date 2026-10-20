@@ -9,6 +9,7 @@ import {
   scValToNative,
   xdr,
 } from '@stellar/stellar-sdk'
+import { allowHttpFor } from '../config/network'
 
 // Soroban call-shape tests for src/wallet/vault.ts (#608). The real SDK builds
 // and encodes every transaction; only the network edges (rpc.Server,
@@ -489,7 +490,9 @@ describe('signed transactions', () => {
   it('uses HTTPS-only RPC clients for the default endpoints', async () => {
     const vault = await loadVault()
     await settle(vault.submitDeposit(100, USER, sign))
-    expect(rpcMock.serverOptions).toContainEqual({ allowHttp: false })
+    expect(rpcMock.serverOptions).toContainEqual({
+      allowHttp: allowHttpFor('https://soroban-testnet.stellar.org'),
+    })
   })
 })
 

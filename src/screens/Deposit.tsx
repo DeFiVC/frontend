@@ -86,6 +86,8 @@ export function Deposit({ onDone }: DepositProps) {
 
   const n = parseAmount(amount)
   const isMemoValid = validateMemoLength(memo).valid
+  const amountHasValidationError =
+    txError !== null && txError !== 'memo_too_long' && txError !== 'vault_paused'
 
   const estimatedFee = useTransactionFee('deposit', n, address, slippageTolerance)
   const feeLabel =
@@ -219,183 +221,229 @@ export function Deposit({ onDone }: DepositProps) {
     }
   }
 
+  const isAmountDisabled =
+    n < minDeposit ||
+    (balance !== null && (n > balance || balance < minDeposit)) ||
+    n > maxTx ||
+    paused ||
+    !isMemoValid
+
+  const amountDisabledReason = paused
+    ? 'Vault paused'
+    : balance !== null && (n > balance || balance < minDeposit)
+      ? t('reasonExceeds')
+      : n > maxTx
+        ? 'Amount exceeds pool limit'
+        : n < minDeposit
+          ? t('reasonMin', { min: formatDecimal(minDeposit, 2) })
+          : !isMemoValid
+            ? t('reasonMemoTooLong')
+            : undefined
+
+  const handleAmountSubmit = (e: React.SyntheticEvent) => {
+    e.preventDefault()
+    if (isAmountDisabled) {
+      setTxError(
+        paused
+          ? 'vault_paused'
+          : balance !== null && (n > balance || balance < minDeposit)
+            ? 'amount_exceeds_balance'
+            : n > maxTx
+              ? 'amount_exceeds_max_tx'
+              : !isMemoValid && n >= minDeposit
+                ? 'memo_too_long'
+                : 'amount_too_low',
+      )
+      setTimeout(() => scrollToFirstError(document), 50)
+      return
+    }
+    changeStep('review')
+  }
+
   const price = livePrice
   const renderStep = (currentStep: DepositStep) => {
     switch (currentStep) {
       case 'amount':
         return (
           <Panel>
-            <h1 style={h1Style}>{t('amountH1')}</h1>
-            <AmountInput
-              value={amount}
-              onChange={setAmount}
-              label={t('amountLabel')}
-              currency={balance !== null ? 'USDC' : ''}
-              balanceLabel={balance !== null ? t('balanceLabel') : ''}
-              balance={balance !== null ? balance.toFixed(2) : 'Balance unavailable'}
-              chips={quickDepositAmounts}
-              min={minDeposit}
-              max={balance !== null ? Math.min(balance, maxTx) : maxTx}
-              cap={balance !== null ? balance : undefined}
-              capMessage={balance !== null ? t('capMessage', { cap: balance }) : undefined}
-              maxChipLabel={t('maxChip')}
-              capActionLabel={t('depositMaxAvailable')}
-              preview={
-                vaultLoading ? (
-                  <span
-                    aria-busy="true"
-                    style={{
-                      display: 'inline-block',
-                      height: 14,
-                      width: 160,
-                      borderRadius: 6,
-                      background: 'var(--ink-06)',
-                      animation: 'hb-pulse 1.4s ease-in-out infinite',
-                    }}
-                  />
-                ) : (
-                  <span
-                    style={{
-                      fontFamily: 'var(--font-body)',
-                      fontSize: 'var(--type-small)',
-                      lineHeight: 1.55,
-                      color: 'var(--ink-60)',
-                    }}
-                  >
-                    {vaultError && (
-                      <span
-                        style={{
-                          display: 'block',
-                          fontSize: 'var(--type-eyebrow)',
-                          color: 'var(--ink-40)',
-                          marginBottom: 2,
-                        }}
-                      >
-                        Using estimated rate
-                      </span>
-                    )}
-                    {t.rich('preview', {
-                      shares: formatDecimal(n / price, 4),
-                      price: formatSharePrice(price),
-                      num,
-                    })}
+            <form onSubmit={handleAmountSubmit} noValidate>
+              <h1 style={h1Style}>{t('amountH1')}</h1>
+              {txError && (
+                <div
+                  id="deposit-form-error"
+                  role="alert"
+                  tabIndex={-1}
+                  style={{
+                    marginBottom: 14,
+                    padding: '10px 14px',
+                    borderRadius: 'var(--radius-input)',
+                    background: 'rgba(179,54,27,0.07)',
+                    border: '1px solid rgba(179,54,27,0.18)',
+                    fontFamily: 'var(--font-body)',
+                    fontSize: 'var(--type-small)',
+                    color: 'var(--ember)',
+                  }}
+                >
+                  {amountDisabledReason || txError}
+                </div>
+              )}
+              <AmountInput
+                value={amount}
+                onChange={(value) => {
+                  setAmount(value)
+                  setTxError(null)
+                }}
+                invalid={amountHasValidationError}
+                errorId={amountHasValidationError ? 'deposit-form-error' : undefined}
+                label={t('amountLabel')}
+                currency={balance !== null ? 'USDC' : ''}
+                balanceLabel={balance !== null ? t('balanceLabel') : ''}
+                balance={balance !== null ? balance.toFixed(2) : 'Balance unavailable'}
+                chips={quickDepositAmounts}
+                min={minDeposit}
+                max={balance !== null ? Math.min(balance, maxTx) : maxTx}
+                cap={balance !== null ? balance : undefined}
+                capMessage={balance !== null ? t('capMessage', { cap: balance }) : undefined}
+                maxChipLabel={t('maxChip')}
+                capActionLabel={t('depositMaxAvailable')}
+                preview={
+                  vaultLoading ? (
+                    <span
+                      aria-busy="true"
+                      style={{
+                        display: 'inline-block',
+                        height: 14,
+                        width: 160,
+                        borderRadius: 6,
+                        background: 'var(--ink-06)',
+                        animation: 'hb-pulse 1.4s ease-in-out infinite',
+                      }}
+                    />
+                  ) : (
                     <span
                       style={{
-                        display: 'block',
-                        marginTop: 4,
-                        fontSize: 'var(--type-caption)',
+                        fontFamily: 'var(--font-body)',
+                        fontSize: 'var(--type-small)',
+                        lineHeight: 1.55,
                         color: 'var(--ink-60)',
                       }}
                     >
-                      Network fee: {feeLabel} · Deposit: {formatDecimal(n, 2)} USDC worth{' '}
-                      {formatDecimal(n / price, 4)} HBS (real-time)
-                    </span>
-                    {n >= minDeposit && (
-                      <div
+                      {vaultError && (
+                        <span
+                          style={{
+                            display: 'block',
+                            fontSize: 'var(--type-eyebrow)',
+                            color: 'var(--ink-40)',
+                            marginBottom: 2,
+                          }}
+                        >
+                          Using estimated rate
+                        </span>
+                      )}
+                      {t.rich('preview', {
+                        shares: formatDecimal(n / price, 4),
+                        price: formatSharePrice(price),
+                        num,
+                      })}
+                      <span
                         style={{
-                          display: 'flex',
-                          flexDirection: 'column',
-                          gap: 6,
-                          marginTop: 8,
-                          paddingTop: 8,
-                          borderTop: '1px solid var(--ink-12)',
+                          display: 'block',
+                          marginTop: 4,
+                          fontSize: 'var(--type-caption)',
+                          color: 'var(--ink-60)',
                         }}
                       >
-                        <span style={{ fontSize: 'var(--type-eyebrow)', color: 'var(--ink-40)' }}>
-                          Projected returns:
-                        </span>
-                        {[1, 5, 10].map((years) => (
-                          <span
-                            key={years}
-                            style={{
-                              fontSize: 'var(--type-caption)',
-                              color: 'var(--ink-60)',
-                            }}
-                          >
-                            {years === 1 ? '1 year:' : `${years} years:`} ≈ $
-                            {formatDecimal(
-                              roundToCents(projectedReturn(n, projectedRate, years)),
-                              2,
-                            )}{' '}
-                            @ {projectedRate}% annual
+                        Network fee: {feeLabel} · Deposit: {formatDecimal(n, 2)} USDC worth{' '}
+                        {formatDecimal(n / price, 4)} HBS (real-time)
+                      </span>
+                      {n >= minDeposit && (
+                        <div
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: 6,
+                            marginTop: 8,
+                            paddingTop: 8,
+                            borderTop: '1px solid var(--ink-12)',
+                          }}
+                        >
+                          <span style={{ fontSize: 'var(--type-eyebrow)', color: 'var(--ink-40)' }}>
+                            Projected returns:
                           </span>
-                        ))}
-                      </div>
-                    )}
-                  </span>
-                )
-              }
-            />
-            <p style={liqLine}>{t.rich('liquidLine', { b: strong })}</p>
-            <MemoInput
-              value={memo}
-              onChange={setMemo}
-              label={t('memoLabel')}
-              placeholder={t('memoPlaceholder')}
-            />
-            <RecurringInvestmentOptions
-              enabled={recurring}
-              amount={n}
-              dayOfMonth={recurrenceDay}
-              onEnabledChange={setRecurring}
-              onDayChange={setRecurrenceDay}
-            />
-            <Button
-              variant="primary"
-              size="lg"
-              style={{ width: '100%', marginTop: 20 }}
-              disabled={
-                n < minDeposit ||
-                (balance !== null && (n > balance || balance < minDeposit)) ||
-                n > maxTx ||
-                paused ||
-                !isMemoValid
-              }
-              reason={
-                paused
-                  ? 'Vault paused'
-                  : balance !== null && (n > balance || balance < minDeposit)
-                    ? t('reasonExceeds')
-                    : n > maxTx
-                      ? 'Amount exceeds pool limit'
-                      : n < minDeposit
-                        ? t('reasonMin', { min: formatDecimal(minDeposit, 2) })
-                        : !isMemoValid
-                          ? t('reasonMemoTooLong')
-                          : undefined
-              }
-              onClick={() => {
-                if (
-                  n < minDeposit ||
-                  (balance !== null && (n > balance || balance < minDeposit)) ||
-                  n > maxTx ||
-                  paused ||
-                  !isMemoValid
-                ) {
-                  setTxError(
-                    paused
-                      ? 'vault_paused'
-                      : balance !== null && (n > balance || balance < minDeposit)
-                        ? 'amount_exceeds_balance'
-                        : n > maxTx
-                          ? 'amount_exceeds_max_tx'
-                          : !isMemoValid && n >= minDeposit
-                            ? 'memo_too_long'
-                            : 'amount_too_low',
+                          {[1, 5, 10].map((years) => (
+                            <span
+                              key={years}
+                              style={{
+                                fontSize: 'var(--type-caption)',
+                                color: 'var(--ink-60)',
+                              }}
+                            >
+                              {years === 1 ? '1 year:' : `${years} years:`} ≈ $
+                              {formatDecimal(
+                                roundToCents(projectedReturn(n, projectedRate, years)),
+                                2,
+                              )}{' '}
+                              @ {projectedRate}% annual
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </span>
                   )
-                  setTimeout(() => scrollToFirstError(document), 50)
-                  return
                 }
-                changeStep('review')
-              }}
-            >
-              {n >= minDeposit &&
-              (balance === null || (n <= balance && balance >= minDeposit)) &&
-              n <= maxTx &&
-              !paused
-                ? t('investCta', { amount: n })
-                : t('investCtaEmpty')}
-            </Button>
+              />
+              <p style={liqLine}>{t.rich('liquidLine', { b: strong })}</p>
+              <MemoInput
+                value={memo}
+                onChange={(value) => {
+                  setMemo(value)
+                  setTxError(null)
+                }}
+                label={t('memoLabel')}
+                placeholder={t('memoPlaceholder')}
+              />
+              <RecurringInvestmentOptions
+                enabled={recurring}
+                amount={n}
+                dayOfMonth={recurrenceDay}
+                onEnabledChange={setRecurring}
+                onDayChange={setRecurrenceDay}
+              />
+              {isAmountDisabled && amountDisabledReason && (
+                <p
+                  id="deposit-submit-reason"
+                  style={{
+                    margin: '16px 0 -12px',
+                    fontFamily: 'var(--font-body)',
+                    fontSize: 'var(--type-caption)',
+                    color: 'var(--ink-60)',
+                  }}
+                >
+                  {amountDisabledReason}
+                </p>
+              )}
+              <Button
+                type="submit"
+                variant="primary"
+                size="lg"
+                style={{
+                  width: '100%',
+                  marginTop: 20,
+                  opacity: isAmountDisabled ? 0.45 : 1,
+                  cursor: isAmountDisabled ? 'not-allowed' : 'pointer',
+                }}
+                aria-disabled={isAmountDisabled}
+                aria-describedby={isAmountDisabled ? 'deposit-submit-reason' : undefined}
+                onClick={handleAmountSubmit}
+              >
+                {n >= minDeposit &&
+                (balance === null || (n <= balance && balance >= minDeposit)) &&
+                n <= maxTx &&
+                !paused
+                  ? t('investCta', { amount: n })
+                  : t('investCtaEmpty')}
+              </Button>
+            </form>
           </Panel>
         )
       case 'review':

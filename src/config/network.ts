@@ -88,6 +88,29 @@ export const SOROBAN_RPC_URL: string =
 
 export const RPC_URL: string = SOROBAN_RPC_URL
 
+/** Options object for Soroban rpc.Server construction. */
+export function sorobanServerOptions(url: string = RPC_URL): { allowHttp: boolean } {
+  return { allowHttp: allowHttpFor(url) }
+}
+
+/**
+ * Create a Soroban RPC server instance configured for the target URL (#720).
+ * Automatically enables allowHttp for plain-HTTP endpoints (local standalone / quickstart).
+ */
+export async function getSorobanServer(url: string = RPC_URL) {
+  const { rpc } = await import('@stellar/stellar-sdk')
+  return new rpc.Server(url, { allowHttp: allowHttpFor(url) })
+}
+
+/**
+ * Create a Stellar Horizon server instance configured for the target URL (#720).
+ * Automatically enables allowHttp for plain-HTTP endpoints (local standalone / quickstart).
+ */
+export async function getHorizonServer(url: string = HORIZON_URL) {
+  const { Horizon } = await import('@stellar/stellar-sdk')
+  return new Horizon.Server(url, { allowHttp: allowHttpFor(url) })
+}
+
 export const EXPLORER_BASE_URL: string = DEFAULT_EXPLORER_URLS[STELLAR_NETWORK]
 
 export const isTestnet: boolean = STELLAR_NETWORK === 'testnet'

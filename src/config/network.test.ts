@@ -11,6 +11,9 @@ import {
   networkLabel,
   isMainnet,
   allowHttpFor,
+  sorobanServerOptions,
+  getSorobanServer,
+  getHorizonServer,
 } from './network'
 
 describe('network configuration', () => {
@@ -68,5 +71,22 @@ describe('network labels and passphrases (#611)', () => {
   it('only allows plain HTTP for http:// URLs', () => {
     expect(allowHttpFor('http://localhost:8000/rpc')).toBe(true)
     expect(allowHttpFor('https://soroban-testnet.stellar.org')).toBe(false)
+  })
+
+  it('sorobanServerOptions derives allowHttp correctly', () => {
+    expect(sorobanServerOptions('http://localhost:8000/rpc')).toEqual({ allowHttp: true })
+    expect(sorobanServerOptions('https://soroban-testnet.stellar.org')).toEqual({
+      allowHttp: false,
+    })
+  })
+
+  it('creates Soroban and Horizon server instances with correct options (#720)', async () => {
+    const rpcServer = await getSorobanServer('http://localhost:8000/rpc')
+    expect(rpcServer).toBeDefined()
+    expect(rpcServer.serverURL.toString()).toContain('http://localhost:8000/rpc')
+
+    const horizonServer = await getHorizonServer('http://localhost:8000')
+    expect(horizonServer).toBeDefined()
+    expect(horizonServer.serverURL.toString()).toContain('http://localhost:8000')
   })
 })

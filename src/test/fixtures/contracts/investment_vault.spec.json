@@ -1,0 +1,1141 @@
+[
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "__constructor",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "admin",
+          "type_": "address"
+        },
+        {
+          "doc": "",
+          "name": "usdc_sac",
+          "type_": "address"
+        },
+        {
+          "doc": "",
+          "name": "registry",
+          "type_": "address"
+        }
+      ],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "deposit",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "usdc_amount",
+          "type_": "i128"
+        },
+        {
+          "doc": "",
+          "name": "min_shares",
+          "type_": "i128"
+        }
+      ],
+      "outputs": ["i128"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "batch_deposit",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "deposits",
+          "type_": "vec"
+        }
+      ],
+      "outputs": ["vec"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "withdraw",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "shares_amount",
+          "type_": "i128"
+        },
+        {
+          "doc": "",
+          "name": "min_usdc_return",
+          "type_": "i128"
+        }
+      ],
+      "outputs": ["i128"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "claim",
+      "inputs": [],
+      "outputs": ["i128"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "fund_project",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "project_id",
+          "type_": "u32"
+        },
+        {
+          "doc": "",
+          "name": "amount",
+          "type_": "i128"
+        }
+      ],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "fund_project_with_approvals",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "project_id",
+          "type_": "u32"
+        },
+        {
+          "doc": "",
+          "name": "amount",
+          "type_": "i128"
+        },
+        {
+          "doc": "",
+          "name": "approvals",
+          "type_": "vec"
+        }
+      ],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "batch_fund_projects",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "fundings",
+          "type_": "vec"
+        },
+        {
+          "doc": "",
+          "name": "approvals",
+          "type_": "vec"
+        }
+      ],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "repay_principal",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "from",
+          "type_": "address"
+        },
+        {
+          "doc": "",
+          "name": "project_id",
+          "type_": "u32"
+        },
+        {
+          "doc": "",
+          "name": "amount",
+          "type_": "i128"
+        }
+      ],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "settle_project",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "project_id",
+          "type_": "u32"
+        }
+      ],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "get_project_position",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "project_id",
+          "type_": "u32"
+        }
+      ],
+      "outputs": ["udt"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "receive_yield",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "from",
+          "type_": "address"
+        },
+        {
+          "doc": "",
+          "name": "amount",
+          "type_": "i128"
+        }
+      ],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "claim_yield",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "from",
+          "type_": "address"
+        }
+      ],
+      "outputs": ["i128"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "get_project_investment",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "project_id",
+          "type_": "u32"
+        }
+      ],
+      "outputs": ["i128"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "max_hbs_supply",
+      "inputs": [],
+      "outputs": ["i128"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "claim_insurance",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "project_id",
+          "type_": "u32"
+        },
+        {
+          "doc": "",
+          "name": "recipient",
+          "type_": "address"
+        },
+        {
+          "doc": "",
+          "name": "amount",
+          "type_": "i128"
+        }
+      ],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "claim_insurance_with_approvals",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "project_id",
+          "type_": "u32"
+        },
+        {
+          "doc": "",
+          "name": "recipient",
+          "type_": "address"
+        },
+        {
+          "doc": "",
+          "name": "amount",
+          "type_": "i128"
+        },
+        {
+          "doc": "",
+          "name": "approvals",
+          "type_": "vec"
+        }
+      ],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "set_multisig_admin",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "signers",
+          "type_": "vec"
+        },
+        {
+          "doc": "",
+          "name": "threshold",
+          "type_": "u32"
+        }
+      ],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "get_multisig_admin",
+      "inputs": [],
+      "outputs": ["tuple"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "get_expected_returns",
+      "inputs": [],
+      "outputs": ["i128"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "total_assets",
+      "inputs": [],
+      "outputs": ["i128"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "convert_to_shares",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "usdc_amount",
+          "type_": "i128"
+        }
+      ],
+      "outputs": ["i128"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "convert_to_assets",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "shares_amount",
+          "type_": "i128"
+        }
+      ],
+      "outputs": ["i128"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "share_price",
+      "inputs": [],
+      "outputs": ["i128"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "preview_deposit",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "usdc_amount",
+          "type_": "i128"
+        }
+      ],
+      "outputs": ["i128"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "preview_withdraw",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "shares_amount",
+          "type_": "i128"
+        }
+      ],
+      "outputs": ["tuple"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "max_withdraw",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "account",
+          "type_": "address"
+        }
+      ],
+      "outputs": ["i128"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "max_deposit",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "account",
+          "type_": "address"
+        }
+      ],
+      "outputs": ["i128"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "get_utilization_bps",
+      "inputs": [],
+      "outputs": ["u32"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "claimable_yield",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "account",
+          "type_": "address"
+        }
+      ],
+      "outputs": ["i128"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "get_portfolio",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "account",
+          "type_": "address"
+        }
+      ],
+      "outputs": ["udt"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "insurance_fund_balance",
+      "inputs": [],
+      "outputs": ["i128"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "accepted_asset",
+      "inputs": [],
+      "outputs": ["address"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "set_management_fee",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "fee_bps",
+          "type_": "u32"
+        },
+        {
+          "doc": "",
+          "name": "recipient",
+          "type_": "address"
+        }
+      ],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "get_management_fee_bps",
+      "inputs": [],
+      "outputs": ["u32"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "enable_secondary_trading",
+      "inputs": [],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "is_trading_enabled",
+      "inputs": [],
+      "outputs": ["bool"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "set_funding_thresholds",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "min_credit_quality",
+          "type_": "u32"
+        },
+        {
+          "doc": "",
+          "name": "min_green_impact",
+          "type_": "u32"
+        }
+      ],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "get_min_credit_quality",
+      "inputs": [],
+      "outputs": ["u32"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "get_min_green_impact",
+      "inputs": [],
+      "outputs": ["u32"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "set_registry",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "new_registry",
+          "type_": "address"
+        }
+      ],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "get_registry",
+      "inputs": [],
+      "outputs": ["address"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "get_hbs_token_info",
+      "inputs": [],
+      "outputs": ["udt"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "set_bridge",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "bridge",
+          "type_": "address"
+        }
+      ],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "bridge_mint",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "to",
+          "type_": "address"
+        },
+        {
+          "doc": "",
+          "name": "amount",
+          "type_": "i128"
+        }
+      ],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "bridge_burn",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "from",
+          "type_": "address"
+        },
+        {
+          "doc": "",
+          "name": "amount",
+          "type_": "i128"
+        }
+      ],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "set_wormhole_core",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "core",
+          "type_": "address"
+        }
+      ],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "set_trusted_emitter",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "chain_id",
+          "type_": "u32"
+        },
+        {
+          "doc": "",
+          "name": "emitter_address",
+          "type_": "bytes_n"
+        },
+        {
+          "doc": "",
+          "name": "trusted",
+          "type_": "bool"
+        }
+      ],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "initiate_bridge_transfer",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "from",
+          "type_": "address"
+        },
+        {
+          "doc": "",
+          "name": "amount",
+          "type_": "i128"
+        },
+        {
+          "doc": "",
+          "name": "target_chain",
+          "type_": "u32"
+        },
+        {
+          "doc": "",
+          "name": "recipient",
+          "type_": "bytes_n"
+        },
+        {
+          "doc": "",
+          "name": "nonce",
+          "type_": "u64"
+        }
+      ],
+      "outputs": ["u64"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "complete_bridge_transfer",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "vaa",
+          "type_": "bytes"
+        }
+      ],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "set_flash_loan_fee",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "fee_bps",
+          "type_": "i128"
+        }
+      ],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "flash_loan_fee",
+      "inputs": [],
+      "outputs": ["i128"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "execute_flash_loan",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "initiator",
+          "type_": "address"
+        },
+        {
+          "doc": "",
+          "name": "borrower",
+          "type_": "address"
+        },
+        {
+          "doc": "",
+          "name": "amount",
+          "type_": "i128"
+        },
+        {
+          "doc": "",
+          "name": "data",
+          "type_": "bytes"
+        }
+      ],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "set_carbon_oracle",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "oracle",
+          "type_": "address"
+        }
+      ],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "set_carbon_credit_price",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "price",
+          "type_": "i128"
+        }
+      ],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "carbon_credit_price",
+      "inputs": [],
+      "outputs": ["i128"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "calculate_carbon_credits",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "project_id",
+          "type_": "u32"
+        },
+        {
+          "doc": "",
+          "name": "amount",
+          "type_": "i128"
+        }
+      ],
+      "outputs": ["udt"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "issue_carbon_credits",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "to",
+          "type_": "address"
+        },
+        {
+          "doc": "",
+          "name": "project_id",
+          "type_": "u32"
+        },
+        {
+          "doc": "",
+          "name": "amount",
+          "type_": "i128"
+        }
+      ],
+      "outputs": ["i128"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "transfer_carbon_credits",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "from",
+          "type_": "address"
+        },
+        {
+          "doc": "",
+          "name": "to",
+          "type_": "address"
+        },
+        {
+          "doc": "",
+          "name": "amount",
+          "type_": "i128"
+        }
+      ],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "carbon_credit_balance",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "address",
+          "type_": "address"
+        }
+      ],
+      "outputs": ["i128"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "set_max_transaction_amount",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "amount",
+          "type_": "i128"
+        }
+      ],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "max_transaction_amount",
+      "inputs": [],
+      "outputs": ["i128"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "record_compliance_event",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "event_type",
+          "type_": "string"
+        },
+        {
+          "doc": "",
+          "name": "data",
+          "type_": "string"
+        }
+      ],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "get_compliance_event",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "seq",
+          "type_": "u64"
+        }
+      ],
+      "outputs": ["udt"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "get_compliance_events",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "from",
+          "type_": "u64"
+        },
+        {
+          "doc": "",
+          "name": "to",
+          "type_": "u64"
+        }
+      ],
+      "outputs": ["vec"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "take_reporting_snapshot",
+      "inputs": [],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "get_latest_snapshot",
+      "inputs": [],
+      "outputs": ["udt"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "export_regulatory_data",
+      "inputs": [],
+      "outputs": ["udt"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "compact_storage",
+      "inputs": [],
+      "outputs": ["u32"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "pause",
+      "inputs": [],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "unpause",
+      "inputs": [],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "is_paused",
+      "inputs": [],
+      "outputs": ["bool"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "set_emergency_admin",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "emergency_admin",
+          "type_": "option"
+        }
+      ],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "get_emergency_admin",
+      "inputs": [],
+      "outputs": ["option"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "emergency_pause",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "caller",
+          "type_": "address"
+        }
+      ],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "emergency_unpause",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "caller",
+          "type_": "address"
+        }
+      ],
+      "outputs": []
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "health_check",
+      "inputs": [],
+      "outputs": ["udt"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "state_version",
+      "inputs": [],
+      "outputs": ["u32"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "stored_state_version",
+      "inputs": [],
+      "outputs": ["u32"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "migrate_state",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "from_version",
+          "type_": "u32"
+        }
+      ],
+      "outputs": ["u32"]
+    }
+  },
+  {
+    "function_v0": {
+      "doc": "",
+      "name": "upgrade",
+      "inputs": [
+        {
+          "doc": "",
+          "name": "new_wasm_hash",
+          "type_": "bytes_n"
+        }
+      ],
+      "outputs": []
+    }
+  }
+]

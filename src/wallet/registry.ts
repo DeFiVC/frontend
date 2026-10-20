@@ -13,7 +13,7 @@ import {
   selectProjectDetail,
   selectScoreHistory,
 } from '../state/selectors'
-import { SOROBAN_RPC_URL as RPC_URL, NETWORK_PASSPHRASE, allowHttpFor } from '../config/network'
+import { SOROBAN_RPC_URL as RPC_URL, NETWORK_PASSPHRASE, getSorobanServer } from '../config/network'
 import { reportError } from '../lib/errorReporting'
 
 function getRegistryContractId(): string | undefined {
@@ -69,10 +69,10 @@ export async function defaultSimulateRegistryCall(
   const contractId = getRegistryContractId()
   if (!contractId) throw new Error('NEXT_PUBLIC_REGISTRY_CONTRACT_ID not set')
 
-  const { rpc, Contract, TransactionBuilder, Account, nativeToScVal, scValToNative } =
+  const { Contract, TransactionBuilder, Account, nativeToScVal, scValToNative } =
     await import('@stellar/stellar-sdk')
 
-  const server = new rpc.Server(RPC_URL, { allowHttp: allowHttpFor(RPC_URL) })
+  const server = await getSorobanServer(RPC_URL)
   const contract = new Contract(contractId)
   const source = new Account(sourceAddress, '0')
   // Honour NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE (local quickstart) via config.
