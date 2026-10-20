@@ -29,6 +29,14 @@ export interface UsePortfolioResult {
   vaultLiquidity: VaultLiquidity | null
 }
 
+interface ChainState {
+  address: string
+  portfolio: OnChainPortfolio | null
+  claimableYield: number
+  vaultLiquidity: VaultLiquidity | null
+  error: string | null
+}
+
 /**
  * usePortfolio — drives investor portfolio metrics from the connected wallet's
  * live Soroban contract state (get_portfolio + claimable_yield) and indexed backend activity.
@@ -42,11 +50,17 @@ export function usePortfolio(customAddress?: string): UsePortfolioResult {
   const enabled =
     Boolean(process.env.NEXT_PUBLIC_VAULT_CONTRACT_ID) && !isDemo && Boolean(connected && address)
 
-  const [portfolio, setPortfolio] = useState<OnChainPortfolio | null>(null)
-  const [claimableYield, setClaimableYield] = useState<number>(0)
-  const [vaultLiquidity, setVaultLiquidity] = useState<VaultLiquidity | null>(null)
-  const [activityFeed, setActivityFeed] = useState<Activity[]>([])
-  const [error, setError] = useState<string | null>(null)
+  /**
+   * Fetched state is stamped with the address it belongs to, so switching
+   * address can never surface the previous wallet's figures: anything stamped
+   * for a different address is ignored when deriving the result (#821).
+   */
+  const [chain, setChain] = useState<ChainState | null>(null)
+  const [activityState, setActivityState] = useState<{ address: string; feed: Activity[] } | null>(
+    null,
+  )
+  // Bumped when a tab that was hidden at mount becomes visible.
+  const [visibleTick, setVisibleTick] = useState(0)
 
   const { tick: reloads, refresh: triggerVaultRefresh } = useVaultRefresh(enabled)
 
@@ -56,9 +70,21 @@ export function usePortfolio(customAddress?: string): UsePortfolioResult {
    * body, which would cause a cascading render (#598). Changing address or
    * asking for a refresh changes the key and re-arms the spinner.
    */
-  const requestKey = enabled && address ? `${address}:${reloads}` : null
+  const requestKey = enabled && address ? `${address}:${reloads}:${visibleTick}` : null
   const [settledKey, setSettledKey] = useState<string | null>(null)
   const loading = requestKey !== null && settledKey !== requestKey
+
+  const loadActivity = useCallback(async (addr: string, isCancelled: () => boolean) => {
+    if (!process.env.NEXT_PUBLIC_API_URL) return
+    try {
+      const remoteActivity = await apiFetch<Activity[]>(`/portfolio/${addr}/activity`)
+      if (!isCancelled() && Array.isArray(remoteActivity)) {
+        setActivityState({ address: addr, feed: remoteActivity })
+      }
+    } catch {
+      // Silent fallback to standard demo activity when backend indexer endpoint is unavailable
+    }
+  }, [])
 
   const loadData = useCallback(
     async (isCancelled: () => boolean) => {
@@ -66,7 +92,7 @@ export function usePortfolio(customAddress?: string): UsePortfolioResult {
         return
       }
 
-      const key = `${address}:${reloads}`
+      const key = `${address}:${reloads}:${visibleTick}`
       try {
         // Fetch Soroban portfolio, yield, and pool liquidity in parallel for time complexity O(1)
         const [portResult, yieldResult, totalAssetsResult, utilBpsResult, liquidResult] =
@@ -80,68 +106,75 @@ export function usePortfolio(customAddress?: string): UsePortfolioResult {
 
         if (isCancelled()) return
 
-        if (portResult.status === 'fulfilled') {
-          setPortfolio(portResult.value)
-          setError(null)
-        } else {
-          const msg =
+        const portfolioValue = portResult.status === 'fulfilled' ? portResult.value : null
+        let claimable = 0
+        let error: string | null = null
+
+        if (portResult.status === 'rejected') {
+          error =
             portResult.reason instanceof Error
               ? portResult.reason.message
               : 'Could not load your on-chain portfolio position'
-          setError(msg)
         }
 
         if (yieldResult.status === 'fulfilled') {
-          setClaimableYield(yieldResult.value)
-        } else if (portResult.status === 'fulfilled') {
-          setClaimableYield(portResult.value.claimableYield)
-          setError(
+          claimable = yieldResult.value
+        } else if (portfolioValue) {
+          claimable = portfolioValue.claimableYield
+          error =
             yieldResult.reason instanceof Error
               ? yieldResult.reason.message
-              : 'Could not load claimable yield',
-          )
+              : 'Could not load claimable yield'
         }
 
+        let liquidity: VaultLiquidity | null = null
         if (totalAssetsResult.status === 'fulfilled' && totalAssetsResult.value > 0) {
           const total = totalAssetsResult.value
           const bps = utilBpsResult.status === 'fulfilled' ? utilBpsResult.value : 0
           const liquid =
             liquidResult.status === 'fulfilled' ? liquidResult.value : total * (1 - bps / 10000)
-          setVaultLiquidity({ liquid, total })
-        } else {
-          setVaultLiquidity(null)
+          liquidity = { liquid, total }
         }
 
-        if (portResult.status === 'fulfilled' && yieldResult.status === 'fulfilled') {
-          setError(null)
-        }
-
-        // Optional backend activity fetch
-        if (process.env.NEXT_PUBLIC_API_URL) {
-          try {
-            const remoteActivity = await apiFetch<Activity[]>(`/portfolio/${address}/activity`)
-            if (!isCancelled() && Array.isArray(remoteActivity)) {
-              setActivityFeed(remoteActivity)
-            }
-          } catch {
-            // Silent fallback to standard demo activity when backend indexer endpoint is unavailable
-          }
-        }
+        setChain((prev) => ({
+          address,
+          // A failed refetch keeps the last good position, but only for this address.
+          portfolio: portfolioValue ?? (prev?.address === address ? prev.portfolio : null),
+          claimableYield: claimable,
+          vaultLiquidity: liquidity,
+          error,
+        }))
       } catch (e) {
         if (!isCancelled()) {
-          setError(e instanceof Error ? e.message : 'Failed to fetch vault portfolio data')
+          setChain((prev) => ({
+            address,
+            portfolio: prev?.address === address ? prev.portfolio : null,
+            claimableYield: prev?.address === address ? prev.claimableYield : 0,
+            vaultLiquidity: prev?.address === address ? prev.vaultLiquidity : null,
+            error: e instanceof Error ? e.message : 'Failed to fetch vault portfolio data',
+          }))
         }
       } finally {
         if (!isCancelled()) {
+          // Loading ends with the on-chain results; activity is fetched separately below.
           setSettledKey(key)
         }
       }
+
+      if (!isCancelled()) void loadActivity(address, isCancelled)
     },
-    [enabled, address, reloads],
+    [enabled, address, reloads, visibleTick, loadActivity],
   )
 
   useEffect(() => {
-    if (document.hidden) return
+    if (document.hidden) {
+      // Nothing is fetched while hidden; retry once the tab becomes visible (#821).
+      const onVisible = () => {
+        if (!document.hidden) setVisibleTick((n) => n + 1)
+      }
+      document.addEventListener('visibilitychange', onVisible)
+      return () => document.removeEventListener('visibilitychange', onVisible)
+    }
     let cancelled = false
     // Kick the fetch off from a microtask so the effect body itself only
     // subscribes; every state update happens in the async continuation (#598).
@@ -150,6 +183,13 @@ export function usePortfolio(customAddress?: string): UsePortfolioResult {
       cancelled = true
     }
   }, [loadData, reloads])
+
+  const current = chain && chain.address === address ? chain : null
+  const portfolio = current?.portfolio ?? null
+  const claimableYield = current?.claimableYield ?? 0
+  const vaultLiquidity = current?.vaultLiquidity ?? null
+  const error = current?.error ?? null
+  const activityFeed = activityState && activityState.address === address ? activityState.feed : []
 
   // Derive YouSummary structure for UI compatibility
   const demoYou = selectYou()

@@ -36,6 +36,13 @@ function getLeafEntries(
   return out
 }
 
+/** ICU argument names (`{name}`, `{count, plural, ...}`) used in a message. */
+function getIcuArgs(message: string): string[] {
+  const args = new Set<string>()
+  for (const m of message.matchAll(/\{\s*([A-Za-z_][\w]*)\s*[,}]/g)) args.add(m[1])
+  return [...args].sort()
+}
+
 const IDENTICAL_ALLOWLIST = new Set<string>([
   'Landing.rowRegistry',
   'Landing.rowVault',
@@ -61,6 +68,24 @@ describe('Message catalog parity', () => {
       ...missingInEn.map((k) => `Missing in en.json: ${k}`),
     ]
     expect(missing).toEqual([])
+  })
+
+  it.each([
+    ['fr.json', fr],
+    ['es.json', es],
+    ['pt.json', pt],
+    ['ar.json', ar],
+  ] as const)('%s uses the same ICU arguments as en.json for every key', (_name, catalog) => {
+    const enEntries = getLeafEntries(en as Record<string, unknown>)
+    const entries = getLeafEntries(catalog as Record<string, unknown>)
+    const mismatches = Object.entries(enEntries)
+      .filter(([key, val]) => typeof val === 'string' && typeof entries[key] === 'string')
+      .filter(
+        ([key, val]) =>
+          getIcuArgs(val as string).join(',') !== getIcuArgs(entries[key] as string).join(','),
+      )
+      .map(([key]) => key)
+    expect(mismatches).toEqual([])
   })
 
   it('uses rentabilidad del bono consistently for Spanish bond yield labels', () => {

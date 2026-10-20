@@ -256,7 +256,7 @@
     "rejectionReason": "Raison",
     "actionRevoke": "Révoquer",
     "revokeConfirm": "Oui, révoquer",
-    "revokeConfirmBody": "La révocation retirera immédiatement l'accès de ce créateur. Vous pourrez annuler cette action.",
+    "revokeConfirmBody": "La révocation retirera immédiatement l'accès de {name}. Vous pourrez annuler cette action.",
     "revokeCancel": "Annuler",
     "actionApprove": "Approuver",
     "toastScoresTitle": "Scores écrits sur la chaîne",
@@ -609,6 +609,11 @@
     "projectNotFound": {
       "title": "Projet introuvable",
       "description": "Le projet d’énergie verte demandé est introuvable."
+    },
+    "project": {
+      "title": "{name} — Détails de l’obligation verte",
+      "description": "{name} ({type}) à {location}. Qualité de crédit vérifiée : {credit}/100, impact vert : {green}/100. Objectif de financement déclaré : {funded}.",
+      "ogTitle": "{name} | Pool d’obligations vertes Heliobond"
     }
   },
   "Errors": {

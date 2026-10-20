@@ -1,8 +1,28 @@
 import type { MetadataRoute } from 'next'
-import { getProjects } from '../lib/api'
+import { getProjectsPaginated } from '../lib/api'
 import { CANONICAL_ORIGIN, PUBLIC_ROUTES } from '../lib/routeMetadata'
 
 const BASE_URL = CANONICAL_ORIGIN
+
+/** Regenerate at most hourly so crawlers see a stable document (#822). */
+export const revalidate = 3600
+
+const PAGE_SIZE = 100
+/** Safety stop so a backend that never reports `hasMore: false` cannot loop forever. */
+const MAX_PAGES = 100
+
+/** Stable "last changed" stamp for static routes; bumped when route content is reworked. */
+const STATIC_LAST_MODIFIED = new Date('2026-01-01T00:00:00.000Z')
+
+async function getAllProjects() {
+  const all: Awaited<ReturnType<typeof getProjectsPaginated>>['projects'] = []
+  for (let page = 1; page <= MAX_PAGES; page++) {
+    const result = await getProjectsPaginated(page, PAGE_SIZE)
+    all.push(...result.projects)
+    if (!result.hasMore || result.projects.length === 0) break
+  }
+  return all
+}
 
 type SitemapEntry = MetadataRoute.Sitemap[number]
 
@@ -30,17 +50,21 @@ const STATIC_ROUTE_PRIORITY: Record<
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes: MetadataRoute.Sitemap = PUBLIC_ROUTES.map((route) => ({
     url: `${BASE_URL}${route === '/' ? '' : route}`,
-    lastModified: new Date(),
+    lastModified: STATIC_LAST_MODIFIED,
     ...(STATIC_ROUTE_PRIORITY[route] ?? { changeFrequency: 'weekly', priority: 0.5 }),
   }))
 
   // Never let a backend hiccup take the sitemap down — an empty project list
-  // still leaves the static routes valid.
-  const projects = await getProjects().catch(() => [])
+  // still leaves the static routes valid — but do not swallow it silently.
+  const projects = await getAllProjects().catch((error) => {
+    console.error('[sitemap] failed to load projects; emitting static routes only', error)
+    return []
+  })
 
   const projectRoutes: MetadataRoute.Sitemap = projects.map((project) => ({
     url: `${BASE_URL}/project/${project.id}`,
-    lastModified: new Date(),
+    // Projects carry no modification timestamp, so omit `lastModified` rather
+    // than stamping every URL with the request time.
     changeFrequency: 'weekly',
     priority: 0.6,
   }))

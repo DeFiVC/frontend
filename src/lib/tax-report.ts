@@ -58,7 +58,8 @@ export function activityToInvestmentEvents(activity: Activity[]): InvestmentEven
           : null
     if (!type) continue
 
-    const amount = typeof item.amount === 'string' ? item.amount.replace(/[^0-9.-]+/g, '') : item.amount
+    const amount =
+      typeof item.amount === 'string' ? item.amount.replace(/[^0-9.-]+/g, '') : item.amount
     const amountUSD = Math.abs(Number.parseFloat(String(amount))) || 0
 
     events.push({

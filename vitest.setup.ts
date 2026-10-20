@@ -11,17 +11,22 @@ type Messages = Record<string, unknown>
  */
 vi.mock('next-intl/server', async () => {
   /** Resolves a dotted key against the English catalog, namespace included. */
-  const lookup = (key: string): string => {
+  const lookup = (key: string, values?: Record<string, unknown>): string => {
     const value = key
       .split('.')
       .reduce<unknown>((node, part) => (node as Messages)?.[part], en as unknown as Messages)
     if (typeof value !== 'string') throw new Error(`Missing message: ${key}`)
-    return value
+    // Plain `{arg}` interpolation, enough for the metadata messages.
+    return values
+      ? value.replace(/\{(\w+)\}/g, (m, name) => (name in values ? String(values[name]) : m))
+      : value
   }
   return {
     // Mirrors next-intl: the returned translator is scoped to the namespace.
     getTranslations: async (namespace?: string) =>
-      namespace ? (key: string) => lookup(`${namespace}.${key}`) : lookup,
+      namespace
+        ? (key: string, values?: Record<string, unknown>) => lookup(`${namespace}.${key}`, values)
+        : lookup,
     getLocale: async () => 'en',
     getMessages: async () => en,
   }

@@ -609,6 +609,11 @@
     "projectNotFound": {
       "title": "Projeto não encontrado",
       "description": "Não foi possível encontrar o projeto de energia verde solicitado."
+    },
+    "project": {
+      "title": "{name} — Detalhes do título verde",
+      "description": "{name} ({type}) em {location}. Qualidade de crédito verificada: {credit}/100, impacto verde: {green}/100. Meta de financiamento declarada: {funded}.",
+      "ogTitle": "{name} | Pool de títulos verdes da Heliobond"
     }
   },
   "Errors": {

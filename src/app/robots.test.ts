@@ -80,7 +80,19 @@ describe('sitemap (#657)', () => {
     for (const entry of await sitemap()) {
       expect(entry.priority).toBeGreaterThan(0)
       expect(entry.changeFrequency).toBeDefined()
-      expect(entry.lastModified).toBeInstanceOf(Date)
+    }
+  })
+
+  it('uses a stable lastModified for static routes and omits it for projects (#822)', async () => {
+    const first = await sitemap()
+    const second = await sitemap()
+    for (const [i, entry] of first.entries()) {
+      expect(entry.lastModified).toEqual(second[i].lastModified)
+      if (new URL(entry.url).pathname.startsWith('/project/')) {
+        expect(entry.lastModified).toBeUndefined()
+      } else {
+        expect(entry.lastModified).toBeInstanceOf(Date)
+      }
     }
   })
 

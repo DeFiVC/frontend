@@ -609,6 +609,11 @@
     "projectNotFound": {
       "title": "Project not found",
       "description": "The requested green energy project could not be found."
+    },
+    "project": {
+      "title": "{name} — Green Bond Details",
+      "description": "{name} ({type}) in {location}. Verified Credit Quality: {credit}/100, Green Impact: {green}/100. Stated Funding Goal: {funded}.",
+      "ogTitle": "{name} | Heliobond Green Bond Pool"
     }
   },
   "Errors": {

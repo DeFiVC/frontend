@@ -1,6 +1,7 @@
 import { Metadata } from 'next'
-import { getTranslations } from 'next-intl/server'
+import { getLocale, getTranslations } from 'next-intl/server'
 import { getProject } from '../../../lib/api'
+import { ogLocale } from '../../../i18n/config'
 import { absoluteTitle } from '../../../lib/routeMetadata'
 import { ProjectDetailClient } from './ProjectDetailClient'
 
@@ -15,6 +16,7 @@ type Props = {
  */
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const t = await getTranslations('Metadata')
+  const locale = await getLocale()
   const resolvedParams = await params
   const id = Number(resolvedParams?.id)
 
@@ -30,20 +32,28 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!data) return notFound()
 
   const { project } = data
-  const title = `${project.name} — Green Bond Details`
-  const description = `${project.name} (${project.type}) in ${project.location}. Verified Credit Quality: ${project.credit}/100, Green Impact: ${project.green}/100. Stated Funding Goal: ${project.funded}.`
+  const title = t('project.title', { name: project.name })
+  const description = t('project.description', {
+    name: project.name,
+    type: project.type,
+    location: project.location,
+    credit: project.credit,
+    green: project.green,
+    funded: project.funded,
+  })
 
   return {
     title,
     description,
     openGraph: {
-      title: `${project.name} | Heliobond Green Bond Pool`,
+      title: t('project.ogTitle', { name: project.name }),
       description,
       type: 'article',
       siteName: 'Heliobond',
+      locale: ogLocale(locale),
       images: [
         {
-          url: '/screenshots/deposit-dark.svg',
+          url: '/assets/og-image.png',
           width: 1200,
           height: 630,
           alt: project.name,

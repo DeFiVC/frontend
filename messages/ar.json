@@ -609,6 +609,11 @@
     "projectNotFound": {
       "title": "المشروع غير موجود",
       "description": "تعذّر العثور على مشروع الطاقة الخضراء المطلوب."
+    },
+    "project": {
+      "title": "{name} — تفاصيل السند الأخضر",
+      "description": "{name} ({type}) في {location}. الجودة الائتمانية الموثّقة: {credit}/100، الأثر الأخضر: {green}/100. هدف التمويل المعلن: {funded}.",
+      "ogTitle": "{name} | مجمّع السندات الخضراء من Heliobond"
     }
   },
   "Errors": {

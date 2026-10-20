@@ -26,3 +26,16 @@ export const LOCALE_NAMES: Record<Locale, string> = {
 }
 
 export const RTL_LOCALES: ReadonlySet<Locale> = new Set(['ar'] as const)
+
+/** Open Graph `og:locale` values (language_TERRITORY) for each supported locale. */
+export const OG_LOCALES: Record<Locale, string> = {
+  en: 'en_US',
+  fr: 'fr_FR',
+  es: 'es_ES',
+  ar: 'ar_AR',
+  pt: 'pt_BR',
+}
+
+export function ogLocale(locale: string): string {
+  return OG_LOCALES[locale as Locale] ?? OG_LOCALES[DEFAULT_LOCALE]
+}
