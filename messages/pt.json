@@ -473,6 +473,8 @@
     "continueWithProvider": "Sign in with {provider}",
     "sendLinkAnyway": "Link this email to my account",
     "linkSentMessage": "A magic sign-in link has been sent to {email}.",
+    "sending": "Sending sign-in link…",
+    "sendError": "We couldn't send the sign-in link. Please try again.",
     "close": "Close"
   },
   "YieldAlert": {

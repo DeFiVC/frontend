@@ -16,8 +16,11 @@ export interface EmailAuthModalProps {
   open: boolean
   /** Callback to close the modal. */
   onClose: () => void
-  /** Callback fired when email submission is successful. */
-  onSuccess?: (email: string) => void
+  /**
+   * Callback fired when email submission is successful. Must resolve only
+   * after the magic link has actually been requested.
+   */
+  onSuccess?: (email: string) => Promise<void>
   /** Callback fired when user redirects to a social provider. */
   onSocialLogin?: (provider: AuthProviderType) => void
 }
@@ -25,29 +28,43 @@ export interface EmailAuthModalProps {
 /**
  * Modal dialog for email-based onboarding and sign-in with real-time social conflict detection.
  */
-export function EmailAuthModal({ open, onClose, onSuccess, onSocialLogin }: EmailAuthModalProps) {
+export function EmailAuthModal(props: EmailAuthModalProps) {
+  // Mounting the form only while open resets its state on every reopen.
+  return props.open ? <EmailAuthForm {...props} /> : null
+}
+
+function EmailAuthForm({ open, onClose, onSuccess, onSocialLogin }: EmailAuthModalProps) {
   const t = useTranslations('AccountConflict')
   const [email, setEmail] = useState('')
   const [submitted, setSubmitted] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
   const [bypassWarning, setBypassWarning] = useState(false)
   const [bioLoading, setBioLoading] = useState(false)
   const [bioError, setBioError] = useState<string | null>(null)
   const dialogRef = useRef<HTMLDivElement>(null)
   useFocusTrap(open, dialogRef, undefined, onClose)
 
-  if (!open) return null
-
   const detection = detectEmailAuthProvider(email)
   const showConflict =
     detection.hasConflict && !bypassWarning && detection.existingProvider !== null
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!email || showConflict) return
+    if (!email || showConflict || submitting) return
 
-    setSubmitted(true)
-    if (onSuccess) {
-      onSuccess(email)
+    setSubmitError(null)
+    setSubmitting(true)
+    try {
+      if (!onSuccess) {
+        throw new Error('Email link sending is not configured')
+      }
+      await onSuccess(email)
+      setSubmitted(true)
+    } catch {
+      setSubmitError(t('sendError'))
+    } finally {
+      setSubmitting(false)
     }
   }
 
@@ -65,7 +82,7 @@ export function EmailAuthModal({ open, onClose, onSuccess, onSocialLogin }: Emai
     try {
       await loginBiometric(email)
       // On success, notify parent and close the modal
-      if (onSuccess) onSuccess(email)
+      if (onSuccess) await onSuccess(email)
       onClose()
     } catch (err: unknown) {
       setBioError(err instanceof Error ? err.message : 'Biometric login failed')
@@ -82,7 +99,7 @@ export function EmailAuthModal({ open, onClose, onSuccess, onSocialLogin }: Emai
       await registerBiometric(email)
       // Establish a verified login session after enrolling the credential.
       await loginBiometric(email)
-      if (onSuccess) onSuccess(email)
+      if (onSuccess) await onSuccess(email)
       onClose()
     } catch (err: unknown) {
       setBioError(err instanceof Error ? err.message : 'Biometric registration failed')
@@ -199,6 +216,7 @@ export function EmailAuthModal({ open, onClose, onSuccess, onSocialLogin }: Emai
               onChange={(e) => {
                 setEmail(e.target.value)
                 setBypassWarning(false)
+                setSubmitError(null)
               }}
               placeholder="you@example.com"
               required
@@ -224,14 +242,28 @@ export function EmailAuthModal({ open, onClose, onSuccess, onSocialLogin }: Emai
               />
             )}
 
+            {submitError && (
+              <p
+                role="alert"
+                style={{
+                  color: 'var(--ember)',
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 'var(--type-small)',
+                  margin: 0,
+                }}
+              >
+                {submitError}
+              </p>
+            )}
+
             <Button
               type="submit"
               variant="primary"
               size="lg"
-              disabled={showConflict || !email}
+              disabled={showConflict || submitting || !email}
               style={{ marginTop: 8 }}
             >
-              {t('submitCta')}
+              {submitting ? t('sending') : t('submitCta')}
             </Button>
           </form>
         )}
