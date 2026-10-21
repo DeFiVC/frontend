@@ -128,6 +128,10 @@ describe('Explore — pagination', () => {
 
   it('restarts at the first page when the filter changes', async () => {
     const user = userEvent.setup()
+    // The filter lives in the URL, so a navigation has to update the mocked params.
+    mockReplace.mockImplementation((url: string) => {
+      mockSearch = url.includes('?') ? url.slice(url.indexOf('?')) : ''
+    })
     mockPaginated([...makeProjects(20, 'Solar'), ...makeProjects(20, 'Wind', 20)])
     render(<Explore onOpen={vi.fn()} />)
     await waitFor(() => expect(cards().length).toBe(12))
@@ -141,6 +145,28 @@ describe('Explore — pagination', () => {
     await waitFor(() => expect(cards().length).toBe(12))
     expect(cards()[0]).toHaveTextContent('Project 21')
   })
+
+  it('follows URL filter changes from back/forward and falls back to All for invalid types', () => {
+    const projects = [...makeProjects(2, 'Solar'), ...makeProjects(2, 'Wind', 2)]
+    const props = { onOpen: vi.fn(), initialProjects: projects, initialTotal: projects.length }
+    mockSearch = '?type=Solar'
+    const { rerender } = render(<Explore {...props} />)
+
+    expect(screen.getByRole('button', { name: 'Solar' })).toHaveAttribute('aria-pressed', 'true')
+    expect(cards()).toHaveLength(2)
+
+    mockSearch = '?type=Wind'
+    rerender(<Explore {...props} />)
+    expect(screen.getByRole('button', { name: 'Wind' })).toHaveAttribute('aria-pressed', 'true')
+    expect(cards()).toHaveLength(2)
+    expect(cards()[0]).toHaveTextContent('Project 3')
+
+    mockSearch = '?type=water'
+    rerender(<Explore {...props} />)
+    expect(screen.getByRole('button', { name: 'All' })).toHaveAttribute('aria-pressed', 'true')
+    expect(cards()).toHaveLength(4)
+  })
+
   it('fetches a second page when hasMore is true and reaches all projects beyond 50', async () => {
     const user = userEvent.setup()
     const allProjects = makeProjects(60)
