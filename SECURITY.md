@@ -65,3 +65,42 @@ Backend-authenticated features use a wallet signature (SEP-53 message signing, o
 a SEP-10 challenge transaction) exchanged for a short-lived JWT bound to the
 G-address (#603). The token is kept in memory only; the session is restored
 through an HttpOnly refresh cookie. See [docs/AUTH.md](docs/AUTH.md).
+
+## Supply chain
+
+Code runs on developer machines and in the production build whenever a
+dependency, lifecycle script, git hook or tool config runs, so those are
+reviewed as code:
+
+- **Package manager:** bun only, with `bun install --frozen-lockfile` in CI.
+  `bun.lock` is the only lockfile that counts; do not add `pnpm-lock.yaml` or
+  `yarn.lock` (the stale `package-lock.json` is being removed in #918).
+- **Scripts and hooks:** changes to `package.json` scripts, `.husky/*`,
+  `.github/workflows/*`, `scripts/*` and tool configs (ESLint, Next, Vitest,
+  Playwright, PostCSS, Tailwind, `bunfig.toml`, `.npmrc`) need a maintainer's
+  review. The `supply-chain review gate` check blocks such a PR until a
+  maintainer applies the `supply-chain-reviewed` label, and prints the exact
+  changes in the job summary. A new push ignores the label, so remove and
+  re-add it after reviewing the new commits.
+- **Hidden content:** the `hidden-content check` CI job fails on tab-padded lines,
+  zero-width or bidi characters, obfuscated code and new root-level scripts
+  (`scripts/check-hidden-content.mjs`).
+- **Dependencies:** a new dependency needs a justification in the PR, its
+  publish date and its install-script status. Do not add a package to
+  `trustedDependencies` without review.
+- **Actions:** workflows that run fork code use the `pull_request` event,
+  which gets no secrets and a read-only token. The one `pull_request_target`
+  workflow (`auto-review.yml`) checks out the base branch and only reads the
+  PR diff through the API; it must never check out or run fork code.
+
+## Incident response
+
+If a malicious change reaches a branch:
+
+1. Revert the merge commit on `main` and block the deploy pipeline.
+2. Rotate every secret the build or runtime could read, including deploy tokens,
+   API keys and error-sink tokens, starting with anything that was present in
+   the environment of the affected build.
+3. Check the affected developer machines and CI runs that installed or built the
+   change, then rebuild them from a clean checkout.
+4. Report it privately (see above) and record the incident in the changelog.
