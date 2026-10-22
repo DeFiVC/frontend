@@ -213,13 +213,30 @@ a background poller — lives in a plain module and is read through
 Copying state in an effect causes a cascading render, and the value is wrong for
 the whole first paint.
 
-| Module                      | Holds                                 | Consumer                  |
-| --------------------------- | ------------------------------------- | ------------------------- |
-| `wallet/session.ts`         | connected address, wallet id, network | `WalletProvider`          |
-| `wallet/transactions.ts`    | pending transaction list              | `TransactionsProvider`    |
-| `lib/yieldAlerts.ts`        | saved yield alerts                    | `YieldAlertProvider`      |
-| `lib/bondUtils.ts`          | bond yield-range filter               | `useBondFilters`          |
-| `hooks/useHorizonHealth.ts` | Horizon reachability                  | `OfflineBanner`, `TopBar` |
+| Module                          | Holds                                 | Consumer                  |
+| ------------------------------- | ------------------------------------- | ------------------------- |
+| `wallet/session.ts`             | connected address, wallet id, network | `WalletProvider`          |
+| `wallet/transactions.ts`        | pending transaction list              | `TransactionsProvider`    |
+| `lib/yieldAlerts.ts`            | saved yield alerts                    | `YieldAlertProvider`      |
+| `lib/bondUtils.ts`              | bond yield-range filter               | `useBondFilters`          |
+| `hooks/useHorizonHealth.tsx`    | Horizon reachability                  | `OfflineBanner`, `TopBar` |
+| `alerts/YieldAlertProvider.tsx` | yield alert store (external)          | `YieldAlertProvider`      |
+| `app/error.tsx`                 | error boundary store                  | `ErrorBoundary`           |
+| `wallet/WalletProvider.tsx`     | wallet session store                  | `WalletProvider`          |
+
+### Wallet vs sign-in session
+
+`wallet/session.ts` and `src/session/` share a name but are **separate layers**:
+
+- **`wallet/session.ts`** — persisted wallet address, wallet id and network,
+  read via `useSyncExternalStore` by `WalletProvider`.
+- **`src/session/`** — SEP-10/53 JWT sign-in (`SessionProvider`,
+  `useRemoteSync`), covered in [`docs/AUTH.md`](docs/AUTH.md).
+
+The demo wallet is excluded from the sign-in session: `SessionProvider.tsx:68`
+skips the JWT exchange when the connected wallet is the demo session. The
+`/api/backend` proxy and `src/proxy.ts` bridge the browser to the backend API;
+see the proxy section of [`docs/API_REFERENCE.md`](docs/API_REFERENCE.md).
 
 ### The snapshot stability rule
 
