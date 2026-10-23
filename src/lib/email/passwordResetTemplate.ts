@@ -74,12 +74,18 @@ export function sanitizeUrl(rawUrl: string): string {
 /**
  * Formats duration in minutes into localized natural language (e.g. "15 minutes", "1 hour", "24 hours").
  */
-const MINUTE_FORMS: Record<SupportedLocale, Partial<Record<Intl.LDMLPluralRule, string>> & { other: string }> = {
+const MINUTE_FORMS: Record<
+  SupportedLocale,
+  Partial<Record<Intl.LDMLPluralRule, string>> & { other: string }
+> = {
   en: { one: 'minute', other: 'minutes' },
   fr: { one: 'minute', other: 'minutes' },
 }
 
-const HOUR_FORMS: Record<SupportedLocale, Partial<Record<Intl.LDMLPluralRule, string>> & { other: string }> = {
+const HOUR_FORMS: Record<
+  SupportedLocale,
+  Partial<Record<Intl.LDMLPluralRule, string>> & { other: string }
+> = {
   en: { one: 'hour', other: 'hours' },
   fr: { one: 'heure', other: 'heures' },
 }
@@ -89,7 +95,11 @@ const MIXED_FORMS: Record<SupportedLocale, (h: number, m: number) => string> = {
   fr: (h, m) => `${h} h ${m} min`,
 }
 
-function pluralize(count: number, forms: Partial<Record<Intl.LDMLPluralRule, string>> & { other: string }, locale: SupportedLocale): string {
+function pluralize(
+  count: number,
+  forms: Partial<Record<Intl.LDMLPluralRule, string>> & { other: string },
+  locale: SupportedLocale,
+): string {
   const rule = new Intl.PluralRules(locale).select(count)
   return `${count} ${forms[rule] ?? forms.other}`
 }

@@ -91,18 +91,22 @@ try {
 
   // Find unused catalog keys: a key is used if its full path or its last
   // segment appears in a static t() call.
-  const unused = catalogKeys.filter((k) => {
-    if (usedFullKeys.has(k)) return false
-    const last = k.split('.').pop()
-    return !usedSuffixes.has(last)
-  }).sort()
+  const unused = catalogKeys
+    .filter((k) => {
+      if (usedFullKeys.has(k)) return false
+      const last = k.split('.').pop()
+      return !usedSuffixes.has(last)
+    })
+    .sort()
 
   if (unused.length > 0) {
     console.error(`\n✗  Unused catalog keys (${unused.length}):\n`)
     for (const k of unused) {
       console.error(`  ${k}`)
     }
-    console.error(`\nRemove the keys above from messages/en.json (and all locales) or reference them in source.`)
+    console.error(
+      `\nRemove the keys above from messages/en.json (and all locales) or reference them in source.`,
+    )
     process.exit(1)
   }
 
