@@ -9,7 +9,17 @@
  *   1. Catalog keys that are never referenced (exit 1 — CI fails).
  *   2. Dynamic key usages `t(`...`)` that bypass static checking (warn only).
  *
- * Exits 1 when unused keys are found, 0 otherwise.
+ * A key counts as used when it appears in a `t()` literal, matches a dynamic
+ * `t(`edu${i}Title`)` template, or appears as a quoted string anywhere in source
+ * (error-code tables and namespace lookups reach keys without calling `t('...')`).
+ *
+ * Keys that were already unused when this check landed are listed in
+ * scripts/unused-keys-baseline.json, so the gate only fails on NEW unused keys.
+ * It also fails when a baseline entry is now used or no longer exists, so the
+ * list can only shrink. Delete a key from every locale and from the baseline
+ * together. Run with --update-baseline to rewrite it after a cleanup.
+ *
+ * Exits 1 when the check fails, 0 otherwise.
  */
 
 import fs from 'node:fs'
@@ -17,6 +27,11 @@ import path from 'node:path'
 
 const SRC_DIR = path.join(process.cwd(), 'src')
 const MESSAGES_PATH = path.join(process.cwd(), 'messages', 'en.json')
+const BASELINE_PATH = path.join(process.cwd(), 'scripts', 'unused-keys-baseline.json')
+const UPDATE_BASELINE = process.argv.includes('--update-baseline')
+
+/** Any quoted string in source, e.g. the 'vault_Paused' entries of an error-code table. */
+const QUOTED_STRING_RE = /['"`]([\w.]+)['"`]/g
 
 /** Match `t('...')`, `tc('...')`, `tErr('...')`, `t.rich('...')` with a string literal. */
 const STATIC_KEY_RE = /\bt(?:c|Err|\.(?:rich|markup|raw))?\(\s*['"`]([\w.]+)['"`]/g
@@ -60,6 +75,8 @@ try {
   const files = walkSync(SRC_DIR)
   const usedSuffixes = new Set()
   const usedFullKeys = new Set()
+  const quotedStrings = new Set()
+  const dynamicPatterns = []
   const dynamicUsages = []
 
   for (const file of files) {
@@ -74,10 +91,15 @@ try {
       usedSuffixes.add(parts[parts.length - 1])
     }
 
+    for (const m of content.matchAll(QUOTED_STRING_RE)) quotedStrings.add(m[1])
+
     for (const m of content.matchAll(DYNAMIC_KEY_RE)) {
       const expr = m[1]
       const line = content.slice(0, m.index).split('\n').length
       dynamicUsages.push({ file: rel, line, expr })
+      // `edu${i}Title` covers every key whose path ends in edu<anything>Title.
+      const source = expr.replace(/[.*+?^()|[\]\\]/g, '\\$&').replace(/\$\{[^}]*\}/g, '\\w+')
+      dynamicPatterns.push(new RegExp(`(^|\\.)${source}$`))
     }
   }
 
@@ -95,22 +117,44 @@ try {
     .filter((k) => {
       if (usedFullKeys.has(k)) return false
       const last = k.split('.').pop()
-      return !usedSuffixes.has(last)
+      if (usedSuffixes.has(last) || quotedStrings.has(k) || quotedStrings.has(last)) return false
+      const tails = k.split('.').map((_, i, parts) => parts.slice(i).join('.'))
+      return !dynamicPatterns.some((re) => tails.some((tail) => re.test(tail)))
     })
     .sort()
 
-  if (unused.length > 0) {
-    console.error(`\n✗  Unused catalog keys (${unused.length}):\n`)
-    for (const k of unused) {
-      console.error(`  ${k}`)
-    }
-    console.error(
-      `\nRemove the keys above from messages/en.json (and all locales) or reference them in source.`,
+  if (UPDATE_BASELINE) {
+    fs.writeFileSync(BASELINE_PATH, `${JSON.stringify(unused, null, 2)}\n`)
+    console.log(
+      `\nWrote ${unused.length} unused keys to ${path.relative(process.cwd(), BASELINE_PATH)}.`,
     )
+    process.exit(0)
+  }
+
+  const baseline = new Set(JSON.parse(fs.readFileSync(BASELINE_PATH, 'utf-8')))
+  const unusedSet = new Set(unused)
+  const added = unused.filter((k) => !baseline.has(k))
+  const stale = [...baseline].filter((k) => !unusedSet.has(k)).sort()
+
+  if (added.length > 0 || stale.length > 0) {
+    if (added.length > 0) {
+      console.error(`\n✗  Unused catalog keys not in the baseline (${added.length}):\n`)
+      for (const k of added) console.error(`  ${k}`)
+      console.error(`\nRemove these keys from messages/*.json or reference them in source.`)
+    }
+    if (stale.length > 0) {
+      console.error(
+        `\n✗  Baseline entries that are now used or no longer exist (${stale.length}):\n`,
+      )
+      for (const k of stale) console.error(`  ${k}`)
+      console.error(`\nRun: node scripts/check-unused-keys.mjs --update-baseline`)
+    }
     process.exit(1)
   }
 
-  console.log(`\n✓  All ${catalogKeys.length} catalog keys are referenced in source.`)
+  console.log(
+    `\n✓  No new unused catalog keys (${baseline.size} known, listed in scripts/unused-keys-baseline.json).`,
+  )
   if (dynamicUsages.length > 0) {
     console.log(`  (${dynamicUsages.length} dynamic key usages listed above for review)`)
   }
