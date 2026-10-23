@@ -507,7 +507,7 @@ export const Portfolio = memo(function Portfolio({ onWithdraw, onDeposit }: Port
                   textDecoration: 'none',
                 }}
               >
-                {t('taxReports')} →
+                {t('taxReports')} <span className="hb-rtl-arrow">→</span>
               </Link>
             </div>
             <span
